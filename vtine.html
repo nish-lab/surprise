@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Favorite Person ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ff85a2;
+            --soft-purple: #f3e5f5;
+            --deep-rose: #d63384;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #heartContainer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #passwordOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fce4ec;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(214, 51, 132, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            display: none;
+            border: 2px solid var(--primary-pink);
+            z-index: 10;
+            animation: fadeIn 0.6s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .active { display: block; }
+
+        h1 { font-family: 'Dancing Script', cursive; color: var(--deep-rose); font-size: 2.5rem; margin: 0 0 15px 0; }
+        p { color: #555; font-size: 1.1rem; line-height: 1.5; }
+
+        .gallery-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .polaroid {
+            background: white;
+            padding: 10px 10px 20px 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transform: rotate(-2deg);
+            width: 140px;
+            border: 1px solid #eee;
+        }
+
+        .polaroid img { width: 100%; height: 120px; object-fit: cover; }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .select-item {
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 10px;
+            background: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .select-item img {
+            width: 100%; height: 80px; object-fit: cover; border-radius: 12px; margin-bottom: 8px;
+        }
+
+        .select-item.selected {
+            border-color: var(--primary-pink);
+            background: var(--soft-purple);
+            transform: scale(1.05);
+        }
+
+        .summary-box {
+            text-align: left;
+            background: var(--soft-purple);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 1px dashed var(--deep-rose);
+        }
+
+        .summary-box div { margin-bottom: 10px; color: #444; font-weight: 600; }
+
+        button {
+            background: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        button:hover { transform: translateY(-3px); background: var(--deep-rose); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        #noBtn { background: #999; transition: opacity 1.5s ease, transform 1.5s ease; }
+
+        input[type="date"] {
+        padding: 12px;
+        border-radius: 15px;
+        border: 2px solid var(--primary-pink);
+        width: 80%; /* Changed from 100% to look better */
+        margin: 20px auto; /* Centers it horizontally */
+        display: block; /* Necessary for auto-margin to work */
+        font-family: inherit;
+        outline: none;
+        background: white;
+        color: #555;
+    }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* The Flower Container */
+    .flower-container {
+        margin: 30px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 180px;
+        position:relative;
+    }
+
+    .flower {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+
+    /* THE PETALS */
+.petal {
+    width: 45px;
+    height: 75px;
+    background: var(--deep-rose);
+    border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+    position: absolute;
+    bottom: 80px; /* This should match the height of your stem to sit on top */
+    transform-origin: bottom center;
+    opacity: 0;
+    z-index: 2;
+}
+
+    /* Blooming Animation */
+    .active .petal {
+        animation: bloom 1.5s 1s ease-out forwards;
+    }
+
+    .petal.p1 { transform: rotate(0deg); }
+    .petal.p2 { transform: rotate(0deg); }
+    .petal.p3 { transform: rotate(0deg); }
+
+    @keyframes grow {
+        0% { transform: scale(0); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes bloom {
+        0% { opacity: 0; transform: rotate(0deg); }
+        100% { opacity: 1; }
+    }
+
+    .active .petal.p2 { transform: rotate(-30deg); }
+    .active .petal.p3 { transform: rotate(30deg); }
+
+    /* THE STEM */
+.stem {
+    width: 6px;
+    height: 80px; /* Length of the stem */
+    background: #4caf50;
+    border-radius: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* THE LEAF */
+.leaf {
+    width: 30px;
+    height: 15px;
+    background: #4caf50;
+    border-radius: 0 50% 0 50%;
+    position: absolute;
+    left: 5px; /* Moves it horizontally from the stem */
+    top: 30px; /* Moves it up/down the stem */
+    transform: rotate(-20deg);
+}
+
+    /* Personal Note Styling */
+    .personal-note {
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.3rem;
+        color: #666;
+        background: #fff9c4;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 5px 5px 10px rgba(0,0,0,0.05);
+        transform: rotate(-1deg);
+        margin: 20px auto;
+        max-width: 80%;
+    }
+
+    </style>
+</head>
+<body>
+
+    <div id="heartContainer"></div>
+
+    <div id="passwordOverlay">
+        <h1>For Your Eyes Only 🔒</h1>
+        <p>Enter our secret word to enter:</p>
+        <input type="password" id="passwordInput" placeholder="Password..." style="max-width: 250px; padding: 10px; border-radius: 10px; border: 2px solid var(--primary-pink); outline: none;">
+        <button onclick="checkPassword()" style="margin-top: 20px;">Unlock ❤️</button>
+        <p id="wrongPass" style="color: var(--deep-rose); display: none; font-size: 0.9rem; margin-top: 10px;">Incorrect! Try again, love. 😘</p>
+    </div>
+
+    <div class="card" id="page1">
+        <h1>Hey Gorgeous! 🌸</h1>
+        <p>I built this little corner of the internet just for you. Ready to see what's inside?</p>
+        <button onclick="nextPage(2)">Yes, show me! ✨</button>
+    </div>
+
+    <div class="card" id="page2">
+        <h1>Our Journey ✨</h1>
+        <p>Every moment with you is like a scene from my favorite movie.</p>
+        <button onclick="nextPage('memories')">Open Memory Box 🎁</button>
+    </div>
+
+    <div class="card" id="pageMemories">
+        <h1>Memory Lane 🎞️</h1>
+        <div class="gallery-container">
+            <div class="polaroid"><img src="IMAGE_URL_HERE"><div class="caption">The Day We Met ❤️</div></div>
+            <div class="polaroid"><img src="IMAGE_URL_HERE"><div class="caption">First Date 🍝</div></div>
+            <div class="polaroid"><img src="IMAGE_URL_HERE"><div class="caption">My Favorite Day ☀️</div></div>
+        </div>
+        <button onclick="nextPage(3)">Next... ✨</button>
+    </div>
+
+    <div class="card" id="page3">
+        <h1>One Question...</h1>
+        <p>Will you be my Valentine?</p>
+        <div class="btn-container">
+            <button onclick="nextPage(4)">YES! ❤️</button>
+            <button id="noBtn" onmouseover="fadeAway()">No</button>
+        </div>
+    </div>
+
+    <div class="card" id="page4">
+        <h1>YAY! ❤️🎉</h1>
+        <p>When are you free for our date?</p>
+        <input type="date" id="dateSelect">
+        <button onclick="nextPage(5)">Pick our meal 🍕</button>
+    </div>
+
+    <div class="card" id="page5">
+        <h1>What's the vibe? 🍕</h1>
+        <p>Pick as many as you want!</p>
+        <div class="selection-grid" id="foodGrid">
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://www.lacasa.com.au/content/uploads/2018/08/Famiglia-Recipe-Book-Margherita-Pizza_1-lightroom.jpg"><p>Pizza</p></div>
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://images.themodernproper.com/production/posts/2016/ClassicCheeseBurger_9.jpg?w=1200&h=1200&q=60&fm=jpg&fit=crop&dm=1749310239&s=463b18fc3bb51dc5d96e866c848527c4"><p>Burger</p></div>
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://www.carolinescooking.com/wp-content/uploads/2023/07/papdi-chaat-featured-pic-sq.jpg"><p>Indian</p></div>
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://www.thespruceeats.com/thmb/vequ4du_9ahBCvjuNErPtixsHsY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vegetarian-bean-and-rice-burrito-recipe-3378550-hero-01-40ecbc08fcc84e80b8be853c1b779a13.jpg"><p>Burrito</p></div>
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://eatdrinkplay.com/wp-content/uploads/2025/10/image-7-1024x819.jpeg"><p>Acai</p></div>
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://tb-static.uber.com/prod/image-proc/processed_images/2775e65d2b3d9a9431ecfdd1ac35bc5e/16bb0a3ab8ea98cfe8906135767f7bf4.jpeg"><p>Mina Bakery</p></div>
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480_1_5x/img/recipe/ras/Assets/ce8c10492ec64d73432d297ba97c14f0/Derivates/7bac05b96c452f226251434456b3052afe166783.jpg"><p>Ice Cream</p></div>
+            <div class="select-item" onclick="toggleSelection(this, true)"><img src="https://tiffycooks.com/wp-content/uploads/2021/09/Screen-Shot-2021-09-21-at-5.21.37-PM.png"><p>Noodles</p></div>
+
+        </div>
+        <button onclick="nextPage(4)" style="background: #ccc; margin-right: 10px;">Back</button>
+        <button onclick="nextPage(6)">Confirm Food ❤️</button>
+    </div>
+
+    <div class="card" id="page6">
+        <h1>Where to? 📍</h1>
+        <div class="selection-grid" id="locationGrid">
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://i.pinimg.com/736x/e0/f4/ba/e0f4baaf2bf43934f69db75d4726f9fb.jpg"><p>Movies</p></div>
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://img.freepik.com/free-vector/diy-creative-workshop_23-2148529239.jpg?semt=ais_hybrid&w=740&q=80"><p>Park DIY</p></div>
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://www.themacleay.com/wp-content/uploads/2016/08/If-you-like-a-good-view-then-heres-a-couple-places-you-need-to-check-out_487_6040471_0_14108963_500.jpg"><p>City</p></div>
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://www.allsportsphysio.com.au/wp-content/uploads/2020/11/AdobeStock_202770520-scaled.jpeg"><p>Hike</p></div>
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://ychef.files.bbci.co.uk/1280x720/p0g2lyq7.jpg"><p>Beach</p></div>
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://cdn.broadsheet.com.au/cache/3e/41/3e41b680984891ba5bb7eeac356b4e7c.jpg"><p>Hijinx Hotel</p></div>
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://images.squarespace-cdn.com/content/v1/54052649e4b071fa060907d5/1750924476728-4D5QPULBXL9FMU32S1NN/zachary-keimig-OmaFZNYOy6E-unsplash.jpg?format=1500w"><p>Escape Room</p></div>
+            <div class="select-item" onclick="toggleSelection(this, false, 'locationGrid')"><img src="https://www.shutterstock.com/shutterstock/photos/1695654856/display_1500/stock-vector-your-choice-handwritten-modern-calligraphy-lettering-on-abstract-watercolor-paint-splash-1695654856.jpg"><p>Your Choice</p></div>
+        </div>
+        <button onclick="nextPage(5)" style="background: #ccc; margin-right: 10px;">Back</button>
+        <button onclick="prepareSummary()">Check My Picks ❤️</button>
+    </div>
+
+    <div class="card" id="pageSummary">
+        <h1>Does this look right? ❤️</h1>
+        <div class="summary-box" id="summaryContent"></div>
+        <button onclick="nextPage(6)" style="background: #ccc; margin-right: 10px;">Back</button>
+        <button id="sendBtn" onclick="sendToFormspree()">Send to my Cutie ✨</button>
+        <p id="errorMsg" style="color:red; display:none; font-size: 0.8rem; margin-top: 10px;">Something went wrong, but I still love you! Screenshot this instead.</p>
+    </div>
+
+    <div class="card" id="page7">
+    <h1>See you soon, Baby! ❤️</h1>
+    
+    <div class="flower-container">
+        <div class="flower">
+            <div class="petal p1"></div>
+            <div class="petal p2"></div>
+            <div class="petal p3"></div>
+            <div class="stem">
+                <div class="leaf"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="personal-note">
+        "Ruchaaa my DARLINGGG!! MY ENTIRE WORLDDD!!! I’ve loved every second since we met, and I can’t wait for many more. You’re my favorite person in the whole world."
+    </div>
+
+    <p style="font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--deep-rose);">
+        Your very own cutie, Nisharg
+    </p>
+</div>
+
+    <script>
+    const MY_PASSWORD = "love"; 
+    const FORMSPREE_URL = "https://formspree.io/f/mvzzrejw";
+    let finalData = {};
+
+    function checkPassword() {
+        if(document.getElementById('passwordInput').value.toLowerCase() === MY_PASSWORD) {
+            document.getElementById('passwordOverlay').style.display = 'none';
+            document.getElementById('page1').classList.add('active');
+        } else { document.getElementById('wrongPass').style.display = 'block'; }
+    }
+
+    // --- THE MISSING FUNCTION THAT FIXES SELECTING ---
+    function toggleSelection(element, isMultiple, gridId) {
+        if (!isMultiple) {
+            // If single select (Locations), unselect others in that grid
+            const grid = document.getElementById(gridId);
+            grid.querySelectorAll('.select-item').forEach(item => item.classList.remove('selected'));
+        }
+        // Toggle the clicked item
+        element.classList.toggle('selected');
+    }
+
+    function nextPage(id) {
+        // 1. If moving from Date (Page 4) to Food (Page 5)
+        if (document.getElementById('page4').classList.contains('active') && id === 5) {
+            if (!document.getElementById('dateSelect').value) {
+                alert("Please pick a date first, my love! ❤️");
+                return;
+            }
+        }
+
+        // 2. If moving from Food (Page 5) to Location (Page 6)
+        if (document.getElementById('page5').classList.contains('active') && id === 6) {
+            const foodSelected = document.querySelectorAll('#foodGrid .selected');
+            if (foodSelected.length === 0) {
+                alert("You haven't picked any food! I know you're hungry... 🍕");
+                return;
+            }
+        }
+
+        // Regular page switching
+        document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+        const nextID = typeof id === 'number' ? 'page' + id : 'page' + id.charAt(0).toUpperCase() + id.slice(1);
+        const nextCard = document.getElementById(nextID);
+        if (nextCard) nextCard.classList.add('active');
+    }
+
+    function prepareSummary() {
+        // 3. Final check for Location (Page 6) before Summary
+        const locationItem = document.querySelector('#locationGrid .selected');
+        if (!locationItem) {
+            alert("Where are we going? Pick a location! 📍");
+            return;
+        }
+
+        const date = document.getElementById('dateSelect').value;
+        const food = Array.from(document.querySelectorAll('#foodGrid .selected p')).map(p => p.innerText).join(", ");
+        const place = locationItem.querySelector('p').innerText;
+        
+        finalData = { date, food, place };
+
+        document.getElementById('summaryContent').innerHTML = `
+            <div>🗓️ <b>Date:</b> ${date}</div>
+            <div>🍴 <b>Food:</b> ${food}</div>
+            <div>📍 <b>Place:</b> ${place}</div>
+        `;
+        nextPage('summary');
+    }
+
+    async function sendToFormspree() {
+        const btn = document.getElementById('sendBtn');
+        btn.disabled = true;
+        btn.innerText = "Sending... ❤️";
+
+        try {
+            const response = await fetch(FORMSPREE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(finalData)
+            });
+
+            if (response.ok) {
+                nextPage(7);
+            } else { throw new Error(); }
+        } catch (err) {
+            document.getElementById('errorMsg').style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = "Try Again";
+        }
+    }
+
+    function fadeAway() {
+        const btn = document.getElementById('noBtn');
+        btn.style.opacity = '0'; btn.style.transform = 'scale(0)';
+        setTimeout(() => { btn.style.display = 'none'; }, 1500);
+    }
+
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.innerHTML = Math.random() > 0.5 ? '❤️' : '🌸';
+        heart.style.position = 'fixed'; heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.top = '100vh'; heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+        heart.style.opacity = Math.random(); heart.style.transition = 'transform 6s linear, opacity 6s';
+        document.getElementById('heartContainer').appendChild(heart);
+        setTimeout(() => {
+            heart.style.transform = `translateY(-110vh) rotate(${Math.random() * 360}deg)`;
+            heart.style.opacity = '0';
+        }, 100);
+        setTimeout(() => heart.remove(), 7000);
+    }
+    setInterval(createHeart, 400);
+
+    document.getElementById('passwordInput').addEventListener("keypress", (e) => { if (e.key === "Enter") checkPassword(); });
+</script>
+</body>
+</html>
